@@ -8,11 +8,14 @@ module Mws::Apis::Feeds
 
     attr_accessor :upc, :tax_code, :msrp, :brand, :manufacturer, :name, :description, :bullet_points
     attr_accessor :item_dimensions, :package_dimensions, :package_weight, :shipping_weight
-    attr_accessor :category, :details
+    attr_accessor :category, :details, :platinum_keywords
+
+    attr_accessor :mfr_part_number, :merchant_catalog_number
 
     def initialize(sku, &block)
       @sku = sku
       @bullet_points = []
+      @platinum_keywords = []
       ProductBuilder.new(self).instance_eval &block if block_given?
       raise Mws::Errors::ValidationError, 'Product must have a category when details are specified.' if @details and @category.nil?
     end
@@ -41,6 +44,12 @@ module Mws::Apis::Feeds
           @msrp.to_xml 'MSRP', xml unless @msrp.nil?
 
           xml.Manufacturer @manufacturer unless @manufacturer.nil?
+          xml.MfrPartNumber @mfr_part_number unless @mfr_part_number.nil?
+          xml.MerchantCatalogNumber @merchant_catalog_number unless @merchant_catalog_number.nil?
+
+          platinum_keywords.each do |platinum_keyword|
+            xml.PlatinumKeyword platinum_keyword
+          end
         }
 
         unless @details.nil?
@@ -93,6 +102,10 @@ module Mws::Apis::Feeds
 
       def bullet_point(bullet_point)
         @product.bullet_points << bullet_point
+      end
+
+      def platinum_keyword(platinum_keyword)
+        @product.platinum_keywords << platinum_keyword
       end
 
       def details(details=nil, &block)
