@@ -48,7 +48,7 @@ module Mws::Apis::Feeds
           xml.MerchantCatalogNumber @merchant_catalog_number unless @merchant_catalog_number.nil?
 
           platinum_keywords.each do |platinum_keyword|
-            xml.PlatinumKeyword platinum_keyword
+            xml.PlatinumKeywords platinum_keyword
           end
         }
 
